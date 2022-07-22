@@ -45,7 +45,7 @@ def importData(setIndex):
                    'MIT-Places-Small',  
                    'dogvscat',
                    'mnist']
-    base_ = 'data'
+    base_ = '../data/resNet/'
 
     print('Dataset: ' + folderNames[setIndex])
     if setIndex == 0:
