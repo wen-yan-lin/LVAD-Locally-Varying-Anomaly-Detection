@@ -117,3 +117,33 @@ def anomalies_in_folder(root_folder_name,
             print_file = 'lvad.jpg')
     plt.title('Anomaly ranking by LVAD')
 
+def anomalies_in_folder2(root_folder_name, 
+                        sub_folder_number = 0, 
+                        max_im_to_display = 100,
+                        num_rows_to_display = 5,
+                        batch_size = 16
+                        ):
+
+    gen = folders2generator(root_folder_name, batch_size = batch_size, target_class=[sub_folder_number])
+    resNet = download_traditional_network()
+    
+    feats, gts, im_paths = generator2feature(resNet, gen)
+    feats = np.concatenate(feats, axis=0)
+    gts = np.concatenate(gts)
+    im_paths = sum(im_paths, [])
+    full_paths = [root_folder_name + '/' + im_path for im_path in im_paths]
+
+    nlvad = NormalizedAnomalyDetector(clf = LVAD())
+    nlvad.fit(feats)
+    scores = nlvad.score_samples(feats)
+    
+    ranks = np.argsort(scores)
+    steps = ranks.size // max_im_to_display
+    chosen_index = ranks[::steps]
+    chosen_paths = [full_paths[ind] for ind in chosen_index]
+    plt.figure(0)
+    display_im(chosen_paths, 
+            num_rows = num_rows_to_display, 
+            print_file = 'lvad.jpg')
+    plt.title('Anomaly ranking by LVAD')
+
