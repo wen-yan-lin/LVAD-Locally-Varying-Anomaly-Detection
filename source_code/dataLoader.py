@@ -45,7 +45,7 @@ def importData(setIndex):
                    'MIT-Places-Small',  
                    'dogvscat',
                    'mnist']
-    base_ = '../../'
+    base_ = 'data'
 
     print('Dataset: ' + folderNames[setIndex])
     if setIndex == 0:
