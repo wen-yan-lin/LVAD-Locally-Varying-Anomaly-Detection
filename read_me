@@ -1,0 +1,11 @@
+Code for:
+Wen-Yan Lin, Zhonghang Liu, Siying Liu, “Locally Varying Distance Transform
+for Unsupervised Visual Anomaly Detection”. ECCV2022.
+
+To run, download data and change the data path in dataLoader.py
+ResNet features can be downloaded at:
+http://www.kind-of-works.com/data/resNet.zip
+Raw Images can be downloaded at:
+http://www.kind-of-works.com/data/raw_images.zip
+
+Have fun!
