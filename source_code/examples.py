@@ -27,6 +27,15 @@ from evaluation import build_eval_set
 from display import display_minst, display_im
 import matplotlib.pyplot as plt
 
+
+def score_reordered_index(given_index, scores):
+    chosen_scores = scores[given_index]
+    scores_rerank = np.argsort(chosen_scores)
+    new_index = given_index[scores_rerank]
+    return new_index
+     
+
+
 def simple_example(data_set = 5, interest_class = 0, anomaly_percentage = 0.1):
 
     x_train, y_train, x_test, y_test, _ = importData(data_set)
@@ -72,7 +81,7 @@ def pca_problem(data_set = 5, interest_class = 0, anomaly_percentage = 0.1,
     score = lvad.score_samples(data)
     print('AUROC of LVAD:', roc_auc_score(gt, score))
 
-def detect_anomalies_in_mnist(interest_class = 9):
+def detect_anomalies_in_mnist_display1(interest_class = 9):
     
     x_train, y_train, x_test, y_test, dataset_name = importData(5)
     print('Interest class:', interest_class)
@@ -104,6 +113,49 @@ def detect_anomalies_in_mnist(interest_class = 9):
     display_minst(x_data[ranks[:20]], 
                 num_rows=4)
     plt.title('The twenty most anomalous members as determined by LVAD:')
+
+
+def detect_anomalies_in_mnist_display2(interest_class = 1):
+    num_rows = 5
+    max_im_to_display = 100
+
+    x_train, y_train, x_test, y_test, dataset_name = importData(5)
+    print('Interest class:', interest_class)
+
+
+    x_data = x_train[y_train==interest_class]
+
+    ocsvm = NormalizedAnomalyDetector(clf = OneClassSVM())
+    ocsvm.fit(x_data)
+    ocsvm_scores = ocsvm.score_samples(x_data)
+    ocsvm_ranks = np.argsort(ocsvm_scores)
+
+
+    nLVAD = NormalizedAnomalyDetector(LVAD(max_num_clus=300))
+    nLVAD.fit(x_data)
+    nLVAD_scores = nLVAD.score_samples(x_data)
+    nLVAD_ranks = np.argsort(nLVAD_scores)
+
+    steps = x_data.shape[0] // max_im_to_display
+    dis_data = x_data[ocsvm_ranks[::steps]]
+    plt.figure(0)
+    display_minst(dis_data[:max_im_to_display], 
+                num_rows=num_rows,
+                print_file = 'ocsvm_' + str(interest_class)+'.png')
+    plt.title('Anomaly ranking as determined by OCSVM:')
+
+    # ensure that both LVAD and OCSVM display the same set of images
+    match_nlVAD_index = score_reordered_index(ocsvm_ranks[::steps], nLVAD_scores)
+    dis_data = x_data[match_nlVAD_index]
+    plt.figure(1)
+    display_minst(dis_data[:max_im_to_display], 
+                num_rows=num_rows,
+                print_file = 'lvad_' + str(interest_class)+'.png')
+    plt.title('Anomaly ranking as determined by LVAD:')
+
+    print('High resolution images are saved in folder')
+
+
 
 def anomalies_in_folder(root_folder_name, 
                         sub_folder_number = 0, 
