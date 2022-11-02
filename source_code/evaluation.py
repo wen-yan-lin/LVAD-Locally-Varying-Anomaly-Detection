@@ -34,8 +34,11 @@ def quick_scoredisplay_scores(clf, data, gt):
 def build_eval_set(x_train, y_train, ind, p_anon):
     x_in = x_train[y_train==ind]
     x_out = x_train[y_train!=ind]
-    random.shuffle(x_out)
-
+    
+    index = np.array(range(x_out.shape[0]))
+    random.shuffle(index)
+    x_out = x_out[index]
+    
     num_out = int(p_anon / 100 * x_in.shape[0])
     data = np.concatenate([x_in, x_out[:num_out]], axis=0)
     gt = np.zeros(data.shape[0], dtype=int)
